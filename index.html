@@ -18,12 +18,12 @@
 *{box-sizing:border-box}
 body{
   margin:0;
-  background:radial-gradient(1000px 500px at top,#0f172a,#000);
+  background:radial-gradient(1200px 600px at top,#0f172a,#000);
   color:var(--text);
   font-family:system-ui,Arial;
 }
 
-/* 🔒 FIX ANDROID SCROLL BUG */
+/* 🔒 LOCK SCROLL ANDROID */
 body.lock-scroll{
   overflow:hidden;
   height:100vh;
@@ -31,109 +31,113 @@ body.lock-scroll{
 }
 
 .container{
-  max-width:1000px;
+  max-width:1100px;
   margin:auto;
   padding:40px 20px;
 }
 
 .header{
   text-align:center;
-  margin-bottom:40px;
+  margin-bottom:50px;
 }
 
 .header h1{
-  font-size:40px;
+  font-size:42px;
   margin:0;
-  letter-spacing:1px;
 }
 
 .header span{color:var(--gold)}
 .header p{color:var(--muted)}
 
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:26px;
+}
+
+/* CARD */
 .card{
   background:linear-gradient(180deg,#020617,#0b1220);
   border:1px solid var(--border);
   border-radius:22px;
-  padding:28px;
-  box-shadow:0 30px 80px rgba(0,0,0,.7);
+  padding:22px;
+  box-shadow:0 25px 70px rgba(0,0,0,.7);
 }
 
-.media img,
-.media iframe{
+.card img{
   width:100%;
   border-radius:16px;
-  margin-bottom:16px;
+  margin-bottom:14px;
 }
+
+.card h2{margin:10px 0}
 
 .spec{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-  gap:14px;
-}
-
-.spec div{
-  background:#020617;
-  border:1px solid var(--border);
-  padding:14px;
-  border-radius:12px;
   font-size:14px;
+  color:var(--muted);
+  line-height:1.6;
 }
 
 .price{
-  font-size:30px;
+  font-size:24px;
   font-weight:800;
   color:var(--gold);
-  margin:26px 0;
-}
-
-.actions{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:14px;
+  margin:18px 0;
 }
 
 .btn{
-  padding:16px;
+  display:block;
   text-align:center;
+  padding:14px;
   border-radius:14px;
   font-weight:700;
   text-decoration:none;
-}
-
-.btn-wa{
-  background:linear-gradient(135deg,#22c55e,#4ade80);
-  color:#022c22;
-}
-
-.btn-tg{
-  background:linear-gradient(135deg,#38bdf8,#0ea5e9);
-  color:#020617;
-}
-
-.links{
-  margin-top:30px;
-}
-
-.links a{
-  display:block;
-  padding:14px;
   margin-top:10px;
   background:#020617;
   border:1px solid var(--border);
-  border-radius:12px;
   color:#38bdf8;
-  text-decoration:none;
-  font-weight:600;
 }
 
 .footer{
-  margin-top:40px;
+  margin-top:50px;
+  text-align:center;
   font-size:12px;
   color:var(--muted);
-  text-align:center;
 }
 
-/* 🔔 NOTICE SCREEN */
+/* 🔄 LOADING */
+#loading{
+  position:fixed;
+  inset:0;
+  background:radial-gradient(circle at top,#020617,#000);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:10000;
+}
+
+.loading-box{text-align:center}
+
+.spinner{
+  width:70px;
+  height:70px;
+  border:6px solid #1e293b;
+  border-top:6px solid #d4af37;
+  border-radius:50%;
+  animation:spin 1s linear infinite;
+  margin:0 auto 20px;
+}
+
+@keyframes spin{
+  to{transform:rotate(360deg)}
+}
+
+.loading-text{
+  color:#9ca3af;
+  font-size:14px;
+}
+
+/* 🔔 NOTICE */
 #notice{
   position:fixed;
   inset:0;
@@ -141,7 +145,7 @@ body.lock-scroll{
   display:flex;
   align-items:center;
   justify-content:center;
-  z-index:9999;
+  z-index:9000;
 }
 
 .notice-box{
@@ -151,20 +155,14 @@ body.lock-scroll{
   border-radius:26px;
   text-align:center;
   max-width:420px;
-  box-shadow:0 30px 80px rgba(0,0,0,.8);
 }
 
-.notice-box h1{
-  margin:0;
-  font-size:36px;
-}
-
+.notice-box h1{margin:0;font-size:36px}
 .notice-box span{color:var(--gold)}
 
 .notice-box p{
   margin:20px 0 30px;
   color:var(--muted);
-  line-height:1.6;
 }
 
 .notice-box button{
@@ -181,14 +179,25 @@ body.lock-scroll{
 
 <body>
 
+<!-- LOADING -->
+<div id="loading">
+  <div class="loading-box">
+    <div class="spinner"></div>
+    <div class="loading-text">
+      Mohon tunggu,<br>
+      sedang memuat info akun yang tersedia saat ini
+    </div>
+  </div>
+</div>
+
 <!-- NOTICE -->
 <div id="notice">
   <div class="notice-box">
     <h1><span>Info</span>Akun</h1>
     <p>
-      Website pribadi penjual.<br>
-      Halaman ini hanya menampilkan<br>
-      akun milik pribadi yang tersedia.
+      Website pribadi.<br>
+      Hanya berisi akun milik pribadi<br>
+      yang tersedia untuk dijual.
     </p>
     <button onclick="closeNotice()">Lanjutkan</button>
   </div>
@@ -198,57 +207,42 @@ body.lock-scroll{
 
   <div class="header">
     <h1><span>Info</span>Akun</h1>
-    <p>Private Game Account Showcase</p>
+    <p>Private Account Collection</p>
   </div>
 
-  <div class="card">
-    <h2>Demo Akun Game</h2>
+  <div class="grid">
 
-    <div class="media">
-      <!-- GAMBAR CONTOH -->
-      <img src="https://images.unsplash.com/photo-1611605698323-b1e99cfd37ea?q=80&w=1200">
-
-      <!-- VIDEO CONTOH -->
-      <iframe height="360"
-        src="https://www.youtube.com/embed/8ZK_S-46KwE"
-        frameborder="0" allowfullscreen>
-      </iframe>
+    <!-- ZEPETO -->
+    <div class="card">
+      <img src="https://images.unsplash.com/photo-1606112219348-204d7d8b94ee?q=80&w=1200">
+      <h2>ZEPETO Account</h2>
+      <div class="spec">
+        • Level tinggi<br>
+        • Outfit premium banyak<br>
+        • Avatar rare<br>
+        • Akun pribadi
+      </div>
+      <div class="price">Rp 1.500.000</div>
+      <a class="btn" href="#">Lihat Detail</a>
     </div>
 
-    <div class="spec">
-      <div>🎖 Rank: Tinggi</div>
-      <div>🎨 Skin: Banyak</div>
-      <div>🎮 Progress: End Game</div>
-      <div>🔐 Status: Aman</div>
-    </div>
-
-    <div class="price">Rp 3.000.000</div>
-
-    <div class="actions">
-      <a class="btn btn-wa" href="#">WhatsApp</a>
-      <a class="btn btn-tg" href="#">Telegram</a>
-    </div>
-
-    <div class="links">
-      <h3>Link Telegram (Rekber / Trusted)</h3>
-      <a href="#">Rekber A</a>
-      <a href="#">Rekber B</a>
-      <a href="#">Rekber C</a>
-    </div>
   </div>
 
   <div class="footer">
-    InfoAkun © Private Page
+    InfoAkun © Private Listing
   </div>
 
 </div>
 
 <script>
-  // kunci scroll saat notice muncul
   document.body.classList.add("lock-scroll");
 
+  window.addEventListener("load",function(){
+    document.getElementById("loading").style.display="none";
+  });
+
   function closeNotice(){
-    document.getElementById("notice").style.display = "none";
+    document.getElementById("notice").style.display="none";
     document.body.classList.remove("lock-scroll");
   }
 </script>
