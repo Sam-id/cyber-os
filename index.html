@@ -2,14 +2,14 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>InfoAkun — Private Game Account</title>
+<title>InfoAkun — Private Account</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
 :root{
-  --bg:#0b0f14;
-  --card:#111827;
-  --border:#1f2937;
+  --bg:#05070c;
+  --card:#0b1220;
+  --border:#1e293b;
   --gold:#d4af37;
   --text:#e5e7eb;
   --muted:#9ca3af;
@@ -18,9 +18,16 @@
 *{box-sizing:border-box}
 body{
   margin:0;
-  background:radial-gradient(1200px 600px at top,#111827,#000);
+  background:radial-gradient(1000px 500px at top,#0f172a,#000);
   color:var(--text);
   font-family:system-ui,Arial;
+}
+
+/* 🔒 FIX ANDROID SCROLL BUG */
+body.lock-scroll{
+  overflow:hidden;
+  height:100vh;
+  touch-action:none;
 }
 
 .container{
@@ -35,26 +42,27 @@ body{
 }
 
 .header h1{
-  font-size:38px;
+  font-size:40px;
   margin:0;
+  letter-spacing:1px;
 }
 
 .header span{color:var(--gold)}
 .header p{color:var(--muted)}
 
 .card{
-  background:linear-gradient(180deg,#0f172a,#020617);
+  background:linear-gradient(180deg,#020617,#0b1220);
   border:1px solid var(--border);
-  border-radius:20px;
+  border-radius:22px;
   padding:28px;
-  box-shadow:0 20px 60px rgba(0,0,0,.6);
+  box-shadow:0 30px 80px rgba(0,0,0,.7);
 }
 
 .media img,
 .media iframe{
   width:100%;
   border-radius:16px;
-  margin-bottom:14px;
+  margin-bottom:16px;
 }
 
 .spec{
@@ -72,10 +80,10 @@ body{
 }
 
 .price{
-  font-size:28px;
+  font-size:30px;
+  font-weight:800;
   color:var(--gold);
-  font-weight:700;
-  margin:24px 0;
+  margin:26px 0;
 }
 
 .actions{
@@ -102,11 +110,11 @@ body{
   color:#020617;
 }
 
-.rekber{
+.links{
   margin-top:30px;
 }
 
-.rekber a{
+.links a{
   display:block;
   padding:14px;
   margin-top:10px;
@@ -125,7 +133,7 @@ body{
   text-align:center;
 }
 
-/* NOTICE */
+/* 🔔 NOTICE SCREEN */
 #notice{
   position:fixed;
   inset:0;
@@ -140,14 +148,15 @@ body{
   background:linear-gradient(180deg,#020617,#0f172a);
   border:1px solid var(--border);
   padding:40px;
-  border-radius:24px;
+  border-radius:26px;
   text-align:center;
   max-width:420px;
+  box-shadow:0 30px 80px rgba(0,0,0,.8);
 }
 
 .notice-box h1{
   margin:0;
-  font-size:34px;
+  font-size:36px;
 }
 
 .notice-box span{color:var(--gold)}
@@ -159,10 +168,10 @@ body{
 }
 
 .notice-box button{
-  padding:14px 28px;
-  border-radius:14px;
+  padding:14px 30px;
+  border-radius:16px;
   border:none;
-  font-weight:700;
+  font-weight:800;
   cursor:pointer;
   background:linear-gradient(135deg,#d4af37,#facc15);
   color:#020617;
@@ -172,18 +181,16 @@ body{
 
 <body>
 
-<!-- NOTICE SCREEN -->
+<!-- NOTICE -->
 <div id="notice">
   <div class="notice-box">
     <h1><span>Info</span>Akun</h1>
     <p>
-      Halaman pribadi penjual.<br>
-      Berisi informasi akun game<br>
-      yang tersedia untuk dilepas.
+      Website pribadi penjual.<br>
+      Halaman ini hanya menampilkan<br>
+      akun milik pribadi yang tersedia.
     </p>
-    <button onclick="document.getElementById('notice').style.display='none'">
-      Lanjutkan
-    </button>
+    <button onclick="closeNotice()">Lanjutkan</button>
   </div>
 </div>
 
@@ -195,13 +202,13 @@ body{
   </div>
 
   <div class="card">
-    <h2>Demo Akun Mobile Legends</h2>
+    <h2>Demo Akun Game</h2>
 
     <div class="media">
-      <!-- GAMBAR CONTOH (PUBLIC IMAGE) -->
-      <img src="https://images.unsplash.com/photo-1611605698323-b1e99cfd37ea?q=80&w=1200" alt="Demo Screenshot">
+      <!-- GAMBAR CONTOH -->
+      <img src="https://images.unsplash.com/photo-1611605698323-b1e99cfd37ea?q=80&w=1200">
 
-      <!-- VIDEO CONTOH (YOUTUBE) -->
+      <!-- VIDEO CONTOH -->
       <iframe height="360"
         src="https://www.youtube.com/embed/8ZK_S-46KwE"
         frameborder="0" allowfullscreen>
@@ -209,32 +216,42 @@ body{
     </div>
 
     <div class="spec">
-      <div>🎖 Rank: Mythic</div>
-      <div>🎨 Skin: 150+</div>
-      <div>🎮 Hero: Lengkap</div>
-      <div>🔐 Bind: Aman</div>
+      <div>🎖 Rank: Tinggi</div>
+      <div>🎨 Skin: Banyak</div>
+      <div>🎮 Progress: End Game</div>
+      <div>🔐 Status: Aman</div>
     </div>
 
-    <div class="price">Rp 3.200.000</div>
+    <div class="price">Rp 3.000.000</div>
 
     <div class="actions">
       <a class="btn btn-wa" href="#">WhatsApp</a>
       <a class="btn btn-tg" href="#">Telegram</a>
     </div>
 
-    <div class="rekber">
-      <h3>Rekber (Telegram)</h3>
-      <a href="#">Rekber MLBB</a>
-      <a href="#">Rekber Game ID</a>
-      <a href="#">Rekber Trusted</a>
+    <div class="links">
+      <h3>Link Telegram (Rekber / Trusted)</h3>
+      <a href="#">Rekber A</a>
+      <a href="#">Rekber B</a>
+      <a href="#">Rekber C</a>
     </div>
   </div>
 
   <div class="footer">
-    InfoAkun © Demo Preview
+    InfoAkun © Private Page
   </div>
 
 </div>
+
+<script>
+  // kunci scroll saat notice muncul
+  document.body.classList.add("lock-scroll");
+
+  function closeNotice(){
+    document.getElementById("notice").style.display = "none";
+    document.body.classList.remove("lock-scroll");
+  }
+</script>
 
 </body>
 </html>
