@@ -1,0 +1,103 @@
+:root { --neon: #00ff41; --bg: #000; }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { background: var(--bg); color: var(--neon); font-family: 'Courier New', monospace; margin: 0; overflow: hidden; }
+
+/* Status Bar Atas */
+#status-bar { height: 45px; border-bottom: 1px solid var(--neon); display: flex; justify-content: space-between; align-items: center; padding: 0 15px; font-size: 11px; background: rgba(0,255,0,0.05); }
+
+/* Grid Aplikasi */
+.app-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; padding: 40px 20px; }
+.app { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+.icon-box { 
+    width: 65px; height: 65px; border: 1px solid var(--neon); border-radius: 15px; 
+    display: flex; align-items: center; justify-content: center; 
+    background: rgba(0,255,0,0.1); margin-bottom: 8px;
+    box-shadow: 0 0 10px rgba(0,255,0,0.2);
+}
+.icon-box img { width: 40px; height: 40px; filter: drop-shadow(0 0 5px var(--neon)); }
+
+/* Window System */
+.window { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: none; flex-direction: column; z-index: 1000; }
+.win-header { padding: 15px; border-bottom: 1px solid var(--neon); display: flex; justify-content: space-between; font-weight: bold; }
+.win-content { flex: 1; padding: 15px; overflow-y: auto; }
+
+/* Terminal */
+#term-out { font-size: 13px; line-height: 1.5; color: #fff; }
+.input-area { display: flex; padding: 10px; border-top: 1px solid #222; }
+#cmd-input { background: transparent; border: none; color: var(--neon); outline: none; flex: 1; font-family: inherit; }
+/* Efek Animasi Wanted */
+@keyframes police-blink {
+    0% { background-color: #000; }
+    50% { background-color: #440000; }
+    100% { background-color: #000; }
+}
+
+.police-warning {
+    animation: police-blink 0.5s infinite;
+}
+
+.star-active {
+    color: #ff0000 !important;
+    text-shadow: 0 0 10px #ff0000;
+}
+
+#wanted-bar {
+    letter-spacing: 5px;
+    color: #333;
+    font-weight: bold;
+}
+/* Market & Mining UI */
+.shop-card {
+    background: rgba(0, 255, 65, 0.05);
+    border: 1px solid var(--neon);
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+}
+
+.shop-card h4 { margin: 0 0 5px 0; color: #fff; }
+.shop-card p { font-size: 11px; margin: 5px 0; color: #aaa; }
+
+.buy-btn {
+    background: var(--neon);
+    color: #000;
+    border: none;
+    padding: 8px 15px;
+    font-weight: bold;
+    border-radius: 4px;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.miner-stats {
+    text-align: center;
+    padding: 20px;
+    border: 2px dashed var(--neon);
+    margin-bottom: 20px;
+}
+
+.temp-warning { color: #ff0000; font-weight: bold; animation: blink 1s infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+/* Animasi Loading Bar */
+.progress-container { width: 100%; background: #111; border: 1px solid var(--neon); margin: 5px 0; height: 10px; position: relative; }
+.progress-bar { height: 100%; background: var(--neon); width: 0%; transition: width 0.1s; box-shadow: 0 0 10px var(--neon); }
+
+/* Efek Teks Berkedip */
+.blink { animation: blinker 1s linear infinite; }
+@keyframes blinker { 50% { opacity: 0; } }
+/* Container bar (background hitam) */
+.progress-container { 
+    width: 100%; 
+    background: #111; 
+    border: 1px solid var(--neon); 
+    margin: 5px 0 10px 0; 
+    height: 8px; 
+}
+
+/* Bar yang jalan (warna hijau neon) */
+.progress-bar { 
+    height: 100%; 
+    background: var(--neon); 
+    width: 0%; 
+    box-shadow: 0 0 8px var(--neon);
+}
