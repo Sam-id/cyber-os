@@ -1,84 +1,169 @@
-let gameData = JSON.parse(localStorage.getItem('cyberOS_save')) || {
-    user: "Anon",
-    btc: 0.0000,
-    xp: 0,
-    level: 1,
-    wanted: 0,
-    activeMissions: [], // Tempat menyimpan misi yang diterima
-    hardware: { isMining: false, temp: 30 }
-};
-
-// Daftar database misi komunitas
-const communityQuests = {
-    "shadow_task": {
-        target: "192.168.1.10",
-        objective: "Hack Database Sekolah",
-        reward: 0.02,
-        desc: "Shadow butuh nilai ujiannya diubah."
+window.CyberGame = {
+    state: JSON.parse(localStorage.getItem('cyberOS_save')) || {
+        user: "Sam",
+        btc: 10.0168,
+        xp: 0,
+        level: 1,
+        wanted: 0,
+        inventory: [],
+        activeMissions: [],
+        hardware: { isMining: false, temp: 30, hashrate: 1.5 },
+        hackingSkill: 1,
+        // --- TAMBAHAN BARU ---
+        userProfile: {
+            username: "Sam", // Sinkronkan dengan state.user
+            bio: "Digital Ghost | System Breaker",
+            badges: ["Seed_Member"]
+        }
     },
-    "ghost_task": {
-        target: "10.0.0.99",
-        objective: "Curi Data Crypto",
-        reward: 0.1,
-        desc: "Ghost ingin saldo exchange kompetitornya bocor."
+    // ... sisa kode databases ...
+itemGraphics: {
+       'sql-injector': 'https://cdn-icons-png.flaticon.com/512/2165/2165031.png',
+        'cpu_v2': 'https://cdn-icons-png.flaticon.com/512/2091/2091665.png', // Ikon CPU
+        'cleaner': 'https://cdn-icons-png.flaticon.com/512/750/750537.png', // Ikon pembersih
+},
+    databases: {
+        web: [
+            { url: "bank-rakyat.com", ip: "10.0.5.1", title: "Bank Rakyat Indonesia", category: "bank", security: "High" },
+            { url: "dark-forum.onion", ip: "6.6.6.1", title: "Shadow Market", category: "dark", security: "Low" }
+        ],
+        servers: {
+            "10.0.5.1": { isHacked: false },
+            "6.6.6.1": { isHacked: false }
+        },
+        shop: [
+          {
+    id: "sql_injector", // ID ini harus sama dengan yang di-check di terminal
+    name: "SQLMAP License",
+    desc: "Membuka akses perintah 'sqlmap' di terminal untuk eksploitasi database.",
+    price: 0.045
+},
+
+          
+            { id: "cleaner", name: "Log Cleaner", price: 0.01, desc: "Hapus 1 bintang Wanted Level." },
+            { id: "cpu_v2", name: "Multi-Core CPU", price: 0.05, desc: "Hashrate mining naik 50%." }
+        ]
+    },
+
+    save: function() {
+        localStorage.setItem('cyberOS_save', JSON.stringify(this.state));
+        this.syncUI();
+    },
+
+    syncUI: function() {
+        // 1. Sinkronisasi Wallet
+        const btcEl = document.getElementById('os-wallet');
+        if (btcEl && this.state.btc !== undefined) {
+            this.state.btc = Number(this.state.btc); 
+            btcEl.innerText = this.state.btc.toFixed(4) + " BTC";
+        }
+
+        // 2. Sinkronisasi Nama User di Header
+        const userHeader = document.querySelector('.header-user-name'); 
+        if (userHeader) {
+            userHeader.innerText = "USER: " + this.state.user.toUpperCase();
+        }
+        
+        // 3. Update XP/Level di Header
+        const xpEl = document.getElementById('os-xp');
+        if (xpEl) {
+            xpEl.innerText = "XP: " + this.state.xp;
+        }
     }
-};
+}; // Pastikan ini adalah penutup dari window.CyberGame
 
-const shopItems = [
-    { id: "proxy_v1", name: "Proxy Tunnel v1", price: 0.02, desc: "Kurangi risiko tertangkap 15%" },
-    
-    { id: "cpu_v2", name: "Multi-Core CPU", price: 0.05, desc: "Hasil mining +50% lebih cepat" },
-    
-    { id: "exploit_kit", name: "Exploit Kit", price: 0.04, type: "tool", desc: "Bruteforce 2x lebih cepat."},
-    { id: "cleaner", name: "Log Cleaner", price: 0.01, desc: "Hapus 1 bintang Wanted Level" }
-];
 
-function saveProgress() {
-    localStorage.setItem('cyberOS_save', JSON.stringify(gameData));
+// Fungsi Logika (Bukan Tampilan)
+function buyItem(id, price) {
+    const game = window.CyberGame;
+    
+    if (game.state.btc >= price) {
+        // 1. Potong saldo
+        game.state.btc -= price;
+        
+        // 2. Masukkan ke inventory
+        game.state.inventory.push(id);
+
+        // --- TAMBAHKAN LOGIKA INI ---
+        // Jika yang dibeli adalah CPU, langsung naikkan hashrate-nya
+        if (id === 'cpu_v2') {
+            // Kita tambah 5.0 MH/s (atau sesuaikan keinginanmu)
+            game.state.hardware.hashrate += 5.0; 
+            showAlert("HARDWARE", "Hashrate naik menjadi " + game.state.hardware.hashrate + " MH/s");
+        }
+        // -----------------------------
+
+        // 3. Simpan dan Update
+        game.save();
+        
+        // Refresh tampilan market dan miner
+        if (typeof renderMarket === 'function') renderMarket();
+        if (typeof renderMiner === 'function') renderMiner();
+        
+        showAlert("SYSTEM", "Pembelian Berhasil!");
+    } else {
+        showAlert("ERROR", "BTC Tidak Cukup!", true);
+    }
 }
 
-// Gunakan window. agar pasti bisa dibaca oleh terminal.js
-window.webDatabase = [
-    // Kategori Bank & Finansial
-    { url: "bank-rakyat.com", ip: "10.0.5.1", title: "Bank Rakyat Virtual", category: "bank" },
-    { url: "crypto-ex.net", ip: "10.0.8.22", title: "Cyber Crypto Exchange", category: "bank" },
-    { url: "global-bank.id", ip: "10.0.1.50", title: "Global Central Bank", category: "bank" },
 
-    // Kategori Pemerintah & Militer (High Security)
-    { url: "gov.go.id", ip: "202.10.1.5", title: "Portal Pusat Pemerintah", category: "pemerintah" },
-    { url: "defense.mil.cy", ip: "202.50.9.11", title: "Defense Network System", category: "pemerintah" },
-    { url: "police.cyber.os", ip: "202.20.2.1", title: "Cyber Police Department", category: "pemerintah" },
+// --- LOGIKA MINING (TAMBAHKAN INI) ---
+function toggleMining() {
+    const state = window.CyberGame.state;
+    // Balikkan status true <-> false
+    state.hardware.isMining = !state.hardware.isMining;
+    
+    // Simpan ke LocalStorage
+    window.CyberGame.save();
+    
+    // Update tampilan di engine.js jika fungsi render ada
+    if (typeof renderMiner === 'function') renderMiner();
+    
+    const status = state.hardware.isMining ? "STARTED" : "STOPPED";
+    showAlert("MINER", "Mining " + status);
+}
+// Fungsi untuk menjual item
+function sellItem(id, sellPrice) {
+    const game = window.CyberGame;
+    const index = game.state.inventory.indexOf(id);
 
-    // Kategori E-Commerce & Bisnis
-    { url: "shopee-virtual.id", ip: "192.168.2.5", title: "Virtual Shop", category: "shop" },
-    { url: "megacorp.com", ip: "192.168.5.10", title: "MegaCorp Industries", category: "shop" },
-    { url: "food-delivery.cy", ip: "192.168.1.15", title: "Cyber Foodies", category: "shop" },
+    if (index > -1) {
+        game.state.inventory.splice(index, 1); // Hapus 1 item dari inventory
+        game.state.btc += Number(sellPrice); // Tambah saldo dari penjualan
+        
+        game.save();
+        game.syncUI();
+        if (typeof renderInventory === 'function') renderInventory(); // Refresh Inventory
+        showAlert("SYSTEM", `Item ${id} terjual seharga ${sellPrice} BTC.`);
+    } else {
+        showAlert("ERROR", "Item tidak ditemukan di inventory.", true);
+    }
+}
 
-    // Kategori Berita & Media Sosial
-    { url: "cyber-news.com", ip: "45.10.1.1", title: "Cyber City News", category: "media" },
-    { url: "chirper.io", ip: "45.20.5.9", title: "Chirper - Social Media", category: "media" },
-    { url: "dark-forum.onion", ip: "6.6.6.1", title: "The Hidden Forum", category: "darkweb" }
-];
-window.webServers = {
-    // Bank
-    "10.0.5.1": { db: "bank_db", user: "admin_br", pass: "Bnk_772" },
-    "10.0.8.22": { db: "crypto_vault", user: "wallet_master", pass: "bitc0in_2025" },
-    "10.0.1.50": { db: "global_finance", user: "super_admin", pass: "global_secure" },
+// Fungsi untuk menggunakan item (Contoh: Log Cleaner)
+function useItem(id) {
+    const game = window.CyberGame;
+    const index = game.state.inventory.indexOf(id);
 
-    // Gov
-    "202.10.1.5": { db: "gov_data", user: "admin_gov", pass: "gov_990" },
-    "202.50.9.11": { db: "military_net", user: "general_x", pass: "nuclear_launch_00" },
-    "202.20.2.1": { db: "police_records", user: "detective_01", pass: "arrest_now" },
+    if (index > -1) {
+        game.state.inventory.splice(index, 1); // Hapus 1 item setelah digunakan
+        
+        if (id === 'cleaner') {
+            game.state.wanted = Math.max(0, game.state.wanted - 1); // Kurangi 1 bintang wanted
+            showAlert("SYSTEM", "Log Cleaner digunakan! Wanted level berkurang.");
+            // Panggil fungsi untuk refresh tampilan wanted level jika ada
+        }
+        
+        game.save();
+        game.syncUI();
+        if (typeof renderInventory === 'function') renderInventory(); // Refresh Inventory
+    } else {
+        showAlert("ERROR", "Item tidak ditemukan di inventory.", true);
+    }
+}
 
-    // Shop & Corp
-    "192.168.2.5": { db: "shop_db", user: "root_shopee", pass: "shp_881" },
-    "192.168.5.10": { db: "mega_core", user: "ceo_corp", pass: "money_is_power" },
-
-    // Dark Web
-    "6.6.6.1": { db: "anonymous_db", user: "ghost_user", pass: "you_cant_see_me" }
-};
-
-
-
-// Pastikan gameData mendukung level hacking
-if (!gameData.hackingSkill) gameData.hackingSkill = 1;
+// Daftarkan ke Global agar bisa dipanggil tombol HTML
+window.buyItem = buyItem;
+window.toggleMining = toggleMining;
+window.sellItem = sellItem;
+window.useItem = useItem;
