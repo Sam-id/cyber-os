@@ -3,123 +3,209 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CyberOS Pro</title>
+    <title>CyberOS Pro - Advanced Hacking Simulator</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script>eruda.init();</script>
 
     <div id="status-bar">
-    <span id="os-user">USER: ANON</span>
-    <div id="wanted-bar">
-        <span id="star1">★</span><span id="star2">★</span><span id="star3">★</span>
+        <span id="os-user">CyberOS</span>
+        <div id="wanted-bar">
+            <span id="star1">★</span><span id="star2">★</span><span id="star3">★</span>
+        </div>
+        <span id="os-wallet">0.0000 BTC</span>
     </div>
-    <span id="os-wallet">0.0000 BTC</span>
-</div>
-
 
     <div class="app-grid">
-        <div class="app" onclick="openWin('win-terminal')">
-            <div class="icon-box">
-                <img src="https://cdn-icons-png.flaticon.com/512/6062/6062646.png">
-            </div>
+        <div class="app-icon" data-target="win-terminal">
+            <div class="icon-box"><img src="https://cdn-icons-png.flaticon.com/512/908/908523.png"></div>
             <span>Terminal</span>
         </div>
-        <div class="app" onclick="openWin('win-social')">
-            <div class="icon-box">
-                <img src="https://cdn-icons-png.flaticon.com/512/1041/1041916.png">
-            </div>
+
+        <div class="app-icon" data-target="win-browser">
+            <div class="icon-box"><img src="https://cdn-icons-png.flaticon.com/512/1006/1006771.png"></div>
+            <span>Browser</span>
+        </div>
+
+        <div class="app-icon" data-target="win-editor">
+            <div class="icon-box"><img src="https://cdn-icons-png.flaticon.com/512/6062/6062261.png"></div>
+            <span>Payload</span>
+        </div>
+
+        <div class="app-icon" data-target="win-cnc">
+            <div class="icon-box"><img src="https://cdn-icons-png.flaticon.com/512/2767/2767146.png"></div>
+            <span>C&C Panel</span>
+        </div>
+
+        <div class="app-icon" data-target="win-social">
+            <div class="icon-box"><img src="https://cdn-icons-png.flaticon.com/512/5968/5968771.png"></div>
             <span>CyberGram</span>
         </div>
-        <div class="app" onclick="openWin('win-market')">
-            <div class="icon-box">
-                <img src="https://cdn-icons-png.flaticon.com/512/1162/1162499.png">
-            </div>
+
+        <div class="app-icon" data-target="win-market">
+            <div class="icon-box"><img src="https://cdn-icons-png.flaticon.com/512/3523/3523887.png"></div>
             <span>Market</span>
         </div>
-    <div class="app" onclick="openWin('win-mining')">
-        <div class="icon-box"><img src="https://cdn-icons-png.flaticon.com/512/3665/3665371.png"></div>
-        <span>Miner</span>
-    </div>
-</div>
-<div class="app" onclick="openWin('win-browser')">
-    <div class="icon-box"><img src="https://cdn-icons-png.flaticon.com/512/3062/3062634.png"></div>
-    <span>Browser</span>
-</div>
 
-          <div id="win-browser" class="window">
-    <div class="win-header">WEB_NAVIGATOR <span onclick="closeWin('win-browser')">[X]</span></div>
-    
-    <div style="background:#f1f1f1; padding:10px; display:flex; gap:5px; border-bottom:1px solid #ccc;">
-        <input type="text" id="browser-search" placeholder="Cari di sini (bank, shop, pemerintah...)" style="flex:1; padding:5px; border-radius:15px; border:1px solid #ccc; outline:none;">
-        <button onclick="searchEngine()" style="padding:5px 15px; border-radius:15px; cursor:pointer; background:#4285f4; color:white; border:none;">Cari</button>
-    </div>
-
-    <div id="web-content" class="win-content" style="background:white; color:#333; overflow-y:auto; height:300px; padding:15px; font-family:Arial, sans-serif;">
-        <center>
-            <h1 style="color:#4285f4; font-size:40px; margin-top:50px;">Cyber<span style="color:#ea4335">Search</span></h1>
-            <p>Ketik kata kunci untuk mulai menjelajah dunia virtual.</p>
-        </center>
-    </div>
-</div>
-
-<div id="win-mining" class="window">
-    <div class="win-header">HASH_MINER_v1.0 <span onclick="closeWin('win-mining')">[X]</span></div>
-    <div class="win-content">
-        <div class="miner-stats">
-            <h2 id="miner-status">M1N1N6</h2>
-            <p>Suhu CPU: <span id="cpu-temp">30.0</span>°C</p>
-            <p>Hashrate: <span id="hash-rate">0.0</span> MH/s</p>
+        <div class="app-icon" data-target="win-mining">
+            <div class="icon-box"><img src="https://cdn-icons-png.flaticon.com/512/2972/2972331.png"></div>
+            <span>Miner</span>
         </div>
-        <button class="buy-btn" id="mine-btn" onclick="toggleMining()">START MINING</button>
-        <hr border="1" color="#00ff41" style="margin: 20px 0;">
-        <small style="color: #888;">Info: Mining legal beban panasnya tinggi. Upgrade CPU di Market untuk hashrate lebih besar.</small>
+      <div class="app-icon" data-target="win-inventory">
+    <div class="icon-box">
+        <img src="https://cdn-icons-png.flaticon.com/512/4044/4044199.png">
     </div>
+    <span>Inventory</span>
 </div>
+
+
+        <div class="app-icon" data-target="win-settings">
+            <div class="icon-box"><img src="https://cdn-icons-png.flaticon.com/512/2040/2040504.png"></div>
+            <span>Settings</span>
+        </div>
+    </div>
+    
+     <div id="win-inventory" class="window" style="display:none;">
+    <div class="win-header">
+        <span>INVENTORY_SYSTEM</span>
+        <button onclick="closeWin('win-inventory')">
+          X</button>
+    </div>
+    <div id="inventory-display" class="win-body">
+        </div>
+</div>
+
+    <div id="win-browser" class="window">
+        <div class="win-header">
+            <span>WEB_NAVIGATOR.exe</span>
+            <span onclick="closeWin('win-browser')" style="cursor:pointer;">[X]</span>
+        </div>
+        
+        <div class="browser-tabs" style="background:#dee1e6; height:30px; display:flex; align-items:flex-end; padding-left:10px;">
+            <div class="browser-tab" style="background:white; padding:5px 15px; border-radius:8px 8px 0 0; font-size:11px; color:#333; display:flex; align-items:center;">
+                🌐 New Tab
+            </div>
+        </div>
+
+        <div class="browser-navbar" style="background:white; padding:8px; display:flex; gap:10px; border-bottom:1px solid #dfe1e5; align-items:center;">
+            <button onclick="browserBack()" style="background:none; border:none; cursor:pointer; font-size:16px;">⬅</button>
+            <button onclick="showSearchHome()" style="background:none; border:none; cursor:pointer; font-size:16px;">🏠</button>
+            <input type="text" id="browser-url" placeholder="Enter URL or search..." 
+                   onkeypress="if(event.key==='Enter') navigateWeb()"
+                   style="flex:1; padding:5px 15px; border-radius:20px; border:1px solid #dfe1e5; background:#f1f3f4; color:#333; outline:none; font-size:12px;">
+        </div>
+
+        <div id="web-display" class="win-content" style="background:white; color:#333; overflow-y:auto; flex:1; padding:0;">
+            <div id="search-home" style="padding:60px 20px; text-align:center; background:white; height:100%;">
+                <h1 style="font-size:45px; margin-bottom:20px; font-family: sans-serif;">
+                    <span style="color:#4285f4;">C</span><span style="color:#ea4335">y</span><span style="color:#fbbc05">b</span><span style="color:#4285f4">e</span><span style="color:#34a853">r</span><span style="color:#ea4335">S</span>
+                </h1>
+                <div style="max-width:500px; margin: 0 auto;">
+                    <input type="text" id="browser-search" placeholder="Cari layanan atau domain..." 
+                           onkeypress="if(event.key==='Enter') searchEngine()"
+                           style="width:100%; padding:12px 20px; border-radius:24px; border:1px solid #dfe1e5; outline:none; box-shadow: 0 1px 6px rgba(0,0,0,0.1);">
+                    <br><br>
+                    <button onclick="searchEngine()" class="buy-btn" style="background:#f8f9fa; color:#3c4043; border:1px solid #f8f9fa; padding:10px 20px; border-radius:4px; font-size:13px;">CyberSearch</button>
+                </div>
+                <p style="margin-top:30px; font-size:11px; color:gray;">Gunakan terminal untuk melacak alamat IP target.</p>
+            </div>
+        </div>
+    </div>
 
     <div id="win-terminal" class="window">
         <div class="win-header">TERMINAL_CORE <span onclick="closeWin('win-terminal')">[X]</span></div>
         <div class="win-content" id="term-out">
-            <div>Welcome to Cyber-OS. Type 'help' to start.</div>
+            <div style="color:var(--neon)">[SYSTEM READY] Type 'help' to see available tools.</div>
         </div>
         <div class="input-area">
             <span>root@anon:~$ </span>
             <input type="text" id="cmd-input" autofocus autocomplete="off">
         </div>
     </div>
-<div id="win-market" class="window">
-    <div class="win-header">BLACK_MARKET <span onclick="closeWin('win-market')">[X]</span></div>
-    <div class="win-content" id="market-list">
-        </div>
-</div>
 
-<div id="win-mining" class="window">
-    <div class="win-header">HASH_MINER_V1 <span onclick="closeWin('win-mining')">[X]</span></div>
-    <div class="win-content">
-        <div class="miner-stats">
-            <h2 id="miner-status">OFFLINE</h2>
-            <p>Suhu: <span id="cpu-temp">30</span>°C</p>
-            <p>Hashrate: <span id="hash-rate">0</span> MH/s</p>
+    <div id="win-editor" class="window">
+        <div class="win-header">PAYLOAD_EDITOR.exe <span onclick="closeWin('win-editor')">[X]</span></div>
+        <div class="win-content">
+            <p style="font-size: 11px; color: var(--neon);">// Rancang 'deface.html' untuk target serangan:</p>
+            <textarea id="payload-code" style="width:100%; height:200px; background:#050505; color:#0f0; border:1px solid #333; font-family:monospace; padding:10px; resize:none;" placeholder="<html><body style='background:black;color:red;'><h1>HACKED</h1></body></html>"></textarea>
+            <button onclick="saveMyPayload()" class="buy-btn" style="margin-top:10px; width:100%;">COMPILE & SAVE PAYLOAD</button>
         </div>
-        <button class="buy-btn" id="mine-btn" onclick="toggleMining()">MULAI MINING (LEGAL)</button>
-        <p style="font-size: 10px; margin-top: 15px;">*Mining ilegal bisa dilakukan via terminal dengan perintah 'exploit'.</p>
+    </div>
+
+    <div id="win-cnc" class="window">
+        <div class="win-header">COMMAND_AND_CONTROL <span onclick="closeWin('win-cnc')">[X]</span></div>
+        <div class="win-content">
+            <div style="background:rgba(0,255,65,0.05); padding:10px; border:1px solid var(--neon); margin-bottom:10px;">
+                <h4 style="margin:0; color:var(--neon);">BOTNET_NETWORK: ONLINE</h4>
+            </div>
+            <div id="cnc-list">
+                <p style="color:gray; font-size:11px;">Belum ada zombie yang terinfeksi di jaringan.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="win-mining" class="window">
+    <div class="win-header">
+        <span>WORKSTATION_MINER_V2</span>
+        <span onclick="closeWin('win-mining')" style="cursor:pointer; color:var(--danger);">[X]</span>
+    </div>
+    <div class="win-content" id="miner-display">
+        <div style="text-align:center; padding:20px;">Memuat sistem...</div>
     </div>
 </div>
+
+
+    <div id="win-market" class="window">
+        <div class="win-header">BLACK_MARKET.onion <span onclick="closeWin('win-market')">[X]</span></div>
+        <div class="win-content">
+            <div id="market-list"></div>
+        </div>
+    </div>
 
     <div id="win-social" class="window">
         <div class="win-header">CYBER_GRAM <span onclick="closeWin('win-social')">[X]</span></div>
-        <div class="win-content" id="social-feed">
-            <p style="color:gray italic">Memuat percakapan komunitas...</p>
+        <div class="win-content" id="social-feed"></div>
+    </div>
+
+    <div id="win-settings" class="window">
+        <div class="win-header">OS_CONFIGURATION <span onclick="closeWin('win-settings')">[X]</span></div>
+        <div class="win-content">
+            <h4 style="border-bottom:1px solid #333; padding-bottom:5px;">SYSTEM_THEME</h4>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
+               <button onclick="setTheme('classic')" style="background: #00ff41; color: black;">
+    CLASSIC_NEON
+</button>
+
+<button onclick="setTheme('matrix')" style="background: #003300; color: #00ff41;">
+    MATRIX_CODE
+</button>
+
+                <button onclick="devAddMoney()" style="width:100%; margin-top:10px; padding:10px; background:#fbbc05; color:black; border:none; font-weight:bold;">
+    [ DEV: ADD 1.0 BTC ]
+</button>
+            </div>
+            <button onclick="resetLayout()" style="width:100%; margin-top:30px; padding:15px; background:red; color:white; border:none; font-weight:bold; cursor:pointer;">[ RESET POSISI IKON ]</button>
         </div>
     </div>
 
-<div id="news-ticker" style="position:fixed; bottom:0; width:100%; background:#050505; border-top:1px solid var(--neon); padding:5px; font-size:10px; z-index:500;">
-    <marquee scrollamount="3" id="news-text">
-        [BERITA] Nilai BTC hari ini stabil di angka $65,000 | Polisi Cyber meningkatkan patroli di jaringan botnet | White Hat Hacker temukan celah di bank lokal...
-    </marquee>
-</div>
+    <div id="custom-alert" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:10000; justify-content:center; align-items:center; font-family:monospace;">
+        <div style="width:85%; max-width:320px; border:1px solid var(--neon); background:#000; padding:20px; text-align:center; box-shadow: 0 0 20px rgba(0,255,65,0.2);">
+            <h3 id="alert-title" style="color:var(--neon); margin-top:0;">[SYSTEM_ALERT]</h3>
+            <p id="alert-msg" style="color:#fff; font-size:13px; line-height:1.4;"></p>
+            <button onclick="closeAlert()" style="background:transparent; color:var(--neon); border:1px solid var(--neon); padding:8px 25px; cursor:pointer; margin-top:10px;">DISMISS</button>
+        </div>
+    </div>
 
-    <script src="data.js"></script>
-    <script src="engine.js"></script>
-    <script src="terminal.js"></script>
+    <div id="news-ticker">
+        <marquee scrollamount="4" id="news-text">[SYSTEM]: Welcome operative. Use 'nslookup' in terminal to reveal hidden website IPs. Stay anonymous.</marquee>
+    </div>
+
+        <script src="data.js"></script>
+        <script src="mission.js"></script>
+        <script src="engine.js"></script>
+        <script src="terminal.js"></script>
 </body>
 </html>
+
