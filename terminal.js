@@ -1,241 +1,169 @@
-// Pastikan Event Listener memanggil fungsi yang benar
+// --- INITIALIZATION ---
+let currentPath = "~"; 
 const termInput = document.getElementById('cmd-input');
 const termOutput = document.getElementById('term-out');
+
+// Fungsi bantu untuk mencetak teks ke terminal
+function printLog(msg, color = "#fff") {
+    // Mencari pola IP (seperti 10.0.5.1) dan membuatnya bisa diklik
+    const formattedMsg = msg.replace(/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/g, (ip) => {
+        return `<span style="color:cyan; cursor:pointer; text-decoration:underline; font-weight:bold;" onclick="quickPaste('${ip}')">${ip}</span>`;
+    });
+
+    termOutput.innerHTML += `<div style="color:${color}">${formattedMsg}</div>`;
+    termOutput.scrollTop = termOutput.scrollHeight;
+}
+
+// Tambahkan fungsi ini agar saat IP diklik, dia otomatis masuk ke kotak input
+window.quickPaste = function(ip) {
+    const input = document.getElementById('cmd-input');
+    if (input) {
+        const currentVal = input.value.trim();
+        // Jika sudah ada perintah (misal: 'sqlmap'), tambahkan IP di belakangnya
+        if (currentVal !== "") {
+            const cmdOnly = currentVal.split(' ')[0];
+            input.value = cmdOnly + " " + ip;
+        } else {
+            // Jika kosong, masukkan IP saja
+            input.value = ip;
+        }
+        input.focus();
+    }
+};
 
 termInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
         const val = termInput.value;
         if (val.trim() !== "") {
-            // Tampilkan apa yang diketik user di layar
-            termOutput.innerHTML += `<div style="color:#0f0;">root@cyber-os:~$ ${val}</div>`;
-            // PANGGIL FUNGSI LOGIKA
+            // Mengambil nama user dari state (misal: "Anon" atau "Sam")
+            const username = (window.CyberGame.state.user || "anon").toLowerCase();
+            
+            termOutput.innerHTML += `<div><span style="color:#0f0;">${username}@cyber-os</span>:<span style="color:#729fcf;">${currentPath}</span>$ ${val}</div>`;
             handleLinuxLogic(val);
         }
         termInput.value = "";
-        termOutput.scrollTop = termOutput.scrollHeight;
     }
 });
 
 function handleLinuxLogic(input) {
-    // Membersihkan input dari spasi ganda (masalah umum di HP)
     const parts = input.trim().split(/\s+/);
     const cmd = parts[0].toLowerCase();
     const target = parts[1] ? parts[1].trim() : null;
+    const core = window.CyberGame; // Panggil induk data
 
     switch(cmd) {
         case "help":
-            termOutput.innerHTML += `<div>
-                <b style="color:white">--- LINUX TERMINAL GUIDE v3.0 ---</b><br>
-                1. <b>nslookup [domain]</b> : Mendapatkan IP dari URL.<br>
-                2. <b>ping [target]</b> : Tes koneksi ke IP/Domain.<br>
-                3. <b>nmap [ip]</b> : Scan port target.<br>
-                4. <b>sqlmap [ip]</b> : Injeksi database (Dapatkan password).<br>
-                5. <b>ssh [ip]</b> : Remote login (Butuh SQL access).<br>
-                6. <b>ls</b> : Lihat file di server.<br>
-                7. <b>./run_exploit</b> : Eksekusi misi akhir.<br>
-                8. <b>exit</b> : Kembali ke localhost.<br>
-                9. <b>clear</b> : Bersihkan layar.
-            </div>`;
+            printLog(`
+            <div style="margin: 5px 0; border: 1px dashed #444; padding: 10px; font-size:11px;">
+                <b style="color:white">--- NETWORK TOOLS ---</b><br>
+                - nslookup [domain] : Trace IP target.<br>
+                - nmap [ip] : Scan ports & vulnerability.<br>
+                - sqlmap [ip] : Exploit SQL & dump database.<br>
+                <b style="color:white">--- REMOTE ACCESS ---</b><br>
+                - ssh [ip] : Login ke server target.<br>
+                - upload payload.html : Deface server (Misi).<br>
+                - rm -rf /logs : Hapus jejak.<br>
+                - exit : Keluar remote.
+            </div>`, "var(--neon)");
             break;
 
         case "nslookup":
-            if (!target) {
-                termOutput.innerHTML += "<div>Usage: nslookup [domain]</div>";
-                break;
-            }
-            
-            const cleanTarget = target.replace(/\s+/g, '').toLowerCase();
-
-            // Efek loading supaya nyata
-            termOutput.innerHTML += `<div>Resolving ${cleanTarget}...</div>`;
-            
+            if (!target) return printErr("Usage: nslookup [domain]");
+            printLog(`Resolving ${target}...`);
             setTimeout(() => {
-                // Ambil data dari window.webDatabase (data.js)
-                const db = window.webDatabase || [];
-                const found = db.find(w => w.url.toLowerCase() === cleanTarget);
-                
+                const found = core.databases.web.find(w => w.url.includes(target));
                 if (found) {
-                    termOutput.innerHTML += `
-                        <div style="color:cyan; margin-top:5px; border-left: 3px solid cyan; padding-left: 10px;">
-                            <b>Server:</b> DNS-Root-Global<br>
-                            <b>Name:</b>   ${found.url}<br>
-                            <b>Address:</b> <span style="color:yellow; font-weight:bold;">${found.ip}</span>
-                        </div>`;
+                    printLog(`Address found: ${found.ip}`, "cyan");
                 } else {
-                    termOutput.innerHTML += `<div style="color:#ff5555;">** NXDOMAIN: '${cleanTarget}' tidak ditemukan.</div>`;
+                    printErr("Host not found.");
                 }
-                termOutput.scrollTop = termOutput.scrollHeight;
             }, 1000);
             break;
 
-        case "ping":
-            if (!target) {
-                termOutput.innerHTML += "<div>Usage: ping [target]</div>";
-                break;
-            }
-            let count = 0;
-            const pingInt = setInterval(() => {
-                if (count < 4) {
-                    termOutput.innerHTML += `<div>Reply from ${target}: bytes=64 time=${Math.floor(Math.random()*40)+10}ms</div>`;
-                    count++;
+        case "nmap":
+            if (!target) return printErr("Usage: nmap [ip]");
+            startLoading(`Scanning vulnerabilities on ${target}...`, 3000, () => {
+                const srv = core.databases.servers[target];
+                if (srv) {
+                    printLog(`PORT 80/tcp OPEN (http)<br>Vulnerability: SQL-Injection detected.`, "#0f0");
                 } else {
-                    clearInterval(pingInt);
-                    termOutput.innerHTML += `<div>Ping statistics for ${target}: Sent = 4, Received = 4</div>`;
+                    printLog("Scan complete. No open ports found.", "gray");
                 }
-                termOutput.scrollTop = termOutput.scrollHeight;
-            }, 600);
+            });
             break;
 
-case "nmap":
-    if (!target) return termOutput.innerHTML += "<div>Usage: nmap [ip]</div>";
-    
-    // Simulasi scanning port
-    startLoading(`Scanning ports on ${target}...`, 3000, () => {
-        termOutput.innerHTML += `
-            <div style="color:#0f0; margin: 10px 0;">
-                Starting Nmap 7.80 ( https://nmap.org ) at 2025-12-30<br>
-                Nmap scan report for ${target}<br>
-                Host is up (0.002s latency).<br><br>
-                PORT     STATE    SERVICE<br>
-                22/tcp   open     ssh<br>
-                80/tcp   open     http<br>
-                3306/tcp open     mysql<br><br>
-                <span style="color:yellow">Nmap done: 1 IP address scanned (1 host up)</span>
-            </div>`;
-        termOutput.scrollTop = termOutput.scrollHeight;
-    });
-    break;
+                case 'sqlmap':
+            // 1. Ambil data inventory
+            const inv = window.CyberGame.state.inventory;
+            
+            // 2. Cek apakah ada License/Toolnya (ID: sql_injector)
+            if (inv.includes('sql_injector')) {
+                // PAKAI 'target' (karena di atas kamu sudah buat const target = parts[1])
+                if (!target) {
+                    printLog("<span style='color:yellow'>Usage: sqlmap [target_ip]</span>");
+                    printLog("Contoh: sqlmap 10.0.5.1");
+                } else {
+                    // Gunakan startLoading biar ada animasinya seperti nmap
+                    startLoading(`Launching SQLMAP v1.4 on ${target}...`, 2000, () => {
+                        printLog("[+] Testing connection... [OK]");
+                        printLog("[+] Finding injection points...");
+                        printLog("<span style='color:#00ff41'>[SUCCESS] Vulnerability found! Database: db_bank_rakyat.</span>");
+                        printLog("Status: <span style='color:cyan'>Ready to 'ssh' to this IP.</span>");
+                        
+                        // Opsional: Tandai server ini sudah bisa di-SSH
+                        if (core.databases.servers && core.databases.servers[target]) {
+                            core.databases.servers[target].isHacked = true;
+                        }
+                    });
+                }
+            } else {
+                // Tampilan kalau belum beli di Market - Gunakan printLog bukan termPrint
+                printLog("<span style='color:#ff3131'>Error: sqlmap command not found.</span>");
+                printLog("Anda harus membeli 'SQLMAP License' di Black Market.");
+            }
+            break;
 
-
-case "ssh":
-    if (!target) return termOutput.innerHTML += "<div>Usage: ssh [ip]</div>";
-    startLoading(`Connecting to ${target}...`, 2000, () => {
-        // Mengubah tampilan prompt agar terasa seperti pindah server
-        termOutput.innerHTML += `<div style="color:cyan">Welcome to Remote Server ${target}. Type 'ls' to see files.</div>`;
-        // Kamu bisa menambahkan variabel status 'isLoggedIn = true' di sini
-    });
-    break;
-
-
-        case "sqlmap":
-    if (!target) return termOutput.innerHTML += "<div>Usage: sqlmap [ip]</div>";
-
-    startLoading(`Searching for SQL vulnerabilities on ${target}...`, 4000, () => {
-        // Ambil data server berdasarkan IP
-        const server = window.webServers[target];
-
-        if (server) {
-            termOutput.innerHTML += `
-                <div style="color:yellow; margin: 10px 0;">
-                    [!] Vulnerability detected: Boolean-based blind SQL injection<br>
-                    [+] Database: '${server.db_name}' identified<br>
-                    [+] Fetching tables from '${server.db_name}'...<br>
-                    [+] Found table: 'users_credentials'<br><br>
-                    <span style="color:#0f0">SUCCESS: Data dump complete!</span><br>
-                    -----------------------------------<br>
-                    <b>USER:</b> ${server.user}<br>
-                    <b>PASS:</b> ${server.pass}<br>
-                    -----------------------------------
-                </div>`;
-        } else {
-            termOutput.innerHTML += `
-                <div style="color:#ff5555; margin-top:5px;">
-                    [!] Error: Target ${target} is not responding or not vulnerable.<br>
-                    <small style="color:gray">Pastikan IP benar dan server sedang online.</small>
-                </div>`;
-        }
-        termOutput.scrollTop = termOutput.scrollHeight;
-    });
-    break;
 
 
         case "ssh":
-            if (!target) return termOutput.innerHTML += "<div>Usage: ssh [target_ip]</div>";
-            if (misi && misi.isHacked) {
-                startLoading(`Establishing encrypted tunnel to ${target}...`, 2000, () => {
-                    currentPath = target; // Simulasi masuk ke server
-                    termOutput.innerHTML += `<div style="background:blue; color:white;">Welcome to Remote Root Shell. Type 'ls' to see files.</div>`;
+            if (!target) return printErr("Usage: ssh [ip]");
+            const server = core.databases.servers[target];
+            if (server && server.isHacked) {
+                startLoading(`Connecting to ${target}...`, 2000, () => {
+                    currentPath = target;
+                    printLog("Session established. Remote access granted.", "cyan");
                 });
             } else {
-                termOutput.innerHTML += "<div style='color:red'>Permission Denied. (SQL exploit required)</div>";
+                printErr("Access Denied. Exploit with 'sqlmap' first.");
             }
             break;
 
-        case "ls":
-    // Menampilkan file rahasia hanya jika sudah login via SSH
-    termOutput.innerHTML += `
-        <div style="color:#fff; margin: 5px 0;">
-            bin/ &nbsp;&nbsp; config/ &nbsp;&nbsp; logs/ &nbsp;&nbsp; <span style="color:lime">run_exploit*</span> &nbsp;&nbsp; database.db
-        </div>`;
-    break;
-
-        case "cat":
-    if (!target) return termOutput.innerHTML += "<div>Usage: cat [filename]</div>";
-    
-    let content = "";
-    if (target === "database.db") {
-        content = "<span style='color:cyan'>[DECRYPTED] Contains user hashes and transaction logs...</span>";
-    } else if (target === "config.json") {
-        content = "{ 'admin_access': true, 'server_loc': 'Jakarta' }";
-    } else {
-        content = `cat: ${target}: No such file or directory`;
-    }
-    
-    termOutput.innerHTML += `<div style="margin: 5px 0;">${content}</div>`;
-    break;
-
-
-case "./run_exploit":
-    startLoading("Executing payload...", 3000, () => {
-        // Menambah saldo BTC di gameData
-        gameData.btc += 0.05; 
-        
-        termOutput.innerHTML += `
-            <div style="color:#0f0; background:rgba(0,255,0,0.1); padding:10px; border:1px solid #0f0; margin-top:10px;">
-                [SUCCESS] Exploit completed.<br>
-                [REWARD] 0.05 BTC has been transferred to your wallet.<br>
-                [WARNING] Connection traced by admin! Type 'exit' immediately!
-            </div>`;
-            
-        // Update tampilan saldo di layar (pastikan fungsi ini ada di engine.js)
-        if (typeof updateUI === "function") updateUI();
-    });
-    break;
-
-
-        case "./run_exploit":
-            if (currentPath === "~") {
-                termOutput.innerHTML += "<div>bash: ./run_exploit: No such file or directory</div>";
-            } else {
-                startLoading("Executing payload in target filesystem...", 5000, () => {
-                    const activeIdx = gameData.activeMissions.findIndex(m => m.target === currentPath);
-                    if (activeIdx !== -1) {
-                        const m = gameData.activeMissions[activeIdx];
-                        gameData.btc += m.reward;
-                        termOutput.innerHTML += `<div style="color:var(--neon)">[OK] Data exfiltrated. +${m.reward} BTC added to wallet.</div>`;
-                        gameData.activeMissions.splice(activeIdx, 1);
-                        updateUI(); saveProgress();
+        case "upload":
+            if (currentPath === "~") return printErr("Connect to a server first via SSH.");
+            if (target === "payload.html") {
+                startLoading("Executing deface script...", 3000, () => {
+                    const activeMission = core.state.activeMissions.find(m => m.ip === currentPath);
+                    if (activeMission) {
+                        core.state.btc += activeMission.reward;
+                        core.state.activeMissions = core.state.activeMissions.filter(m => m.ip !== currentPath);
+                        printLog(`[SUCCESS] Target Defaced! Reward: ${activeMission.reward} BTC received.`, "lime");
+                    } else {
+                        printLog("Payload uploaded, but no mission active for this IP.", "yellow");
                     }
+                    core.save(); // Simpan otomatis saldo baru
                 });
-// Di dalam case "./run_exploit" (terminal.js)
-startLoading("Running exploit payload...", 4000, () => {
-    gameData.btc += 0.05;
-    gameData.wanted += 1;
-    termOutput.innerHTML += "<div style='color:lime'>[SUCCESS] Data breached.</div>";
-    
-    // Kirim berita ke browser
-    updateNews("Laporan terbaru: Terjadi aktivitas ilegal pada server " + currentSession);
-    
-    updateUI();
-});
-
-            }
-          
+            } else { printErr("File not found."); }
             break;
 
-        case "exit":
-            currentPath = "~";
-            termOutput.innerHTML += "<div>Connection closed. Back to local machine.</div>";
+        case "tasks":
+            if (core.state.activeMissions.length === 0) {
+                printLog("No active tasks.");
+            } else {
+                printLog("ACTIVE MISSIONS:", "cyan");
+                core.state.activeMissions.forEach(m => {
+                    printLog(`> ${m.target} : ${m.desc} (${m.reward} BTC)`);
+                });
+            }
             break;
 
         case "clear":
@@ -243,17 +171,28 @@ startLoading("Running exploit payload...", 4000, () => {
             break;
 
         default:
-            termOutput.innerHTML += `<div style="color:gray">bash: ${cmd}: command not found.</div>`;
+            printLog(`bash: ${cmd}: command not found`, "gray");
     }
 }
+
+function printErr(text) {
+    printLog("Error: " + text, "#ff5555");
+}
+
 function startLoading(message, duration, callback) {
-    termOutput.innerHTML += `<div>${message}</div>`;
+    let div = document.createElement('div');
+    termOutput.appendChild(div);
     let progress = 0;
     const interval = setInterval(() => {
         progress += 10;
-        if (progress > 100) {
+        let bar = "[";
+        for(let i=0; i<10; i++) bar += (i < progress/10) ? "#" : ".";
+        bar += "]";
+        div.innerHTML = `${message} <span style="color:cyan">${bar} ${progress}%</span>`;
+        if (progress >= 100) {
             clearInterval(interval);
             callback();
         }
+        termOutput.scrollTop = termOutput.scrollHeight;
     }, duration / 10);
 }
